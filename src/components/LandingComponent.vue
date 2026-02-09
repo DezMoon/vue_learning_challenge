@@ -54,14 +54,13 @@
         </button>
       </div>
     </div>
-    <HabitForm v-if="isModalOpen" />
+    <HabitForm v-if="isModalOpen" @close="isModalOpen = false" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import HabitForm from "./HabitForm.vue";
-// checks if modal is open or not
 const isModalOpen = ref(false);
 const openModal = () => (isModalOpen.value = true);
 </script>

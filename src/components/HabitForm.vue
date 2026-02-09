@@ -6,6 +6,7 @@
       class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl p-6 sm:p-10 relative"
     >
       <button
+        @click="closeModal"
         class="absolute top-6 right-8 text-slate-300 hover:text-slate-600 transition-colors text-xl font-bold"
       >
         ✕
@@ -81,4 +82,13 @@
   </div>
 </template>
 
-<script></script>
+<script setup lang="ts">
+// Define the events this component can send to the parent
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
+
+const closeModal = () => {
+  emit("close");
+};
+</script>
