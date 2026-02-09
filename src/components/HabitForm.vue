@@ -21,7 +21,13 @@
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <button
-          class="group flex flex-col items-center justify-center p-4 sm:p-6 bg-sky-50/50 border border-sky-100 rounded-3xl transition-all hover:bg-sky-100 hover:scale-105 active:scale-95"
+          @click="selectedCategory = 'Health'"
+          :class="[
+            'group flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl transition-all hover:scale-105 active:scale-95 border-2',
+            selectedCategory === 'Health'
+              ? 'border-sky-500 bg-sky-100'
+              : 'bg-sky-50/50 border-sky-100',
+          ]"
         >
           <div
             class="w-10 h-10 bg-sky-500 rounded-full mb-3 flex items-center justify-center text-white shadow-md"
@@ -32,7 +38,13 @@
         </button>
 
         <button
-          class="group flex flex-col items-center justify-center p-4 sm:p-6 bg-blue-50/50 border border-blue-100 rounded-3xl transition-all hover:bg-blue-100 hover:scale-105 active:scale-95"
+          @click="selectedCategory = 'Study'"
+          :class="[
+            'group flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl transition-all hover:scale-105 active:scale-95 border-2',
+            selectedCategory === 'Study'
+              ? 'border-blue-500 bg-blue-100'
+              : 'bg-blue-50/50 border-blue-100',
+          ]"
         >
           <div
             class="w-10 h-10 bg-blue-500 rounded-full mb-3 flex items-center justify-center text-white shadow-md"
@@ -43,7 +55,13 @@
         </button>
 
         <button
-          class="group flex flex-col items-center justify-center p-4 sm:p-6 bg-indigo-50/50 border border-indigo-400 rounded-3xl transition-all hover:bg-indigo-100 hover:scale-105 active:scale-95"
+          @click="selectedCategory = 'Workout'"
+          :class="[
+            'group flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl transition-all hover:scale-105 active:scale-95 border-2',
+            selectedCategory === 'Workout'
+              ? 'border-indigo-500 bg-indigo-100'
+              : 'bg-indigo-50/50 border-indigo-400',
+          ]"
         >
           <div
             class="w-10 h-10 bg-indigo-500 rounded-full mb-3 flex items-center justify-center text-white shadow-md"
@@ -54,26 +72,40 @@
         </button>
 
         <button
-          class="group flex flex-col items-center justify-center p-4 sm:p-6 bg-slate-50 border border-slate-100 rounded-3xl transition-all hover:bg-slate-100 hover:scale-105 active:scale-95"
+          @click="selectedCategory = 'Other'"
+          :class="[
+            'group flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl transition-all hover:scale-105 active:scale-95 border-2',
+            selectedCategory === 'Other'
+              ? 'border-slate-700 bg-slate-200'
+              : 'bg-slate-50 border-slate-100',
+          ]"
         >
           <div
             class="w-10 h-10 bg-slate-700 rounded-full mb-3 flex items-center justify-center text-white shadow-md"
           >
-            <span class="text-lg">💆‍♀️</span>
+            <span class="text-lg">➕</span>
           </div>
-          <span class="font-bold text-sm text-slate-900">Relax</span>
+          <span class="font-bold text-sm text-slate-900">Other</span>
         </button>
       </div>
 
       <input
-        class="mt-8 border w-full rounded-full border-blue-200 font-serif pl-4 text-blue-00"
+        v-model="habitName"
+        maxlength="50"
+        class="mt-8 border w-full rounded-full border-blue-200 font-serif pl-4 py-3 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
         type="text"
         placeholder="Enter your habits here.........."
+        @keyup.enter="handleSubmit"
       />
+      <div class="text-sm mt-2 text-right text-red-400">
+        {{ habitName.length }}/50
+      </div>
 
       <div class="mt-10 text-center">
         <button
-          class="bg-blue-400 text-white px-8 py-3 rounded-full font-medium hover:bg-blue-300 transition-all active:scale-95 shadow-lg shadow-slate-200"
+          @click="handleSubmit"
+          :disabled="!habitName.trim()"
+          class="bg-blue-400 text-white px-8 py-3 rounded-full font-medium hover:bg-blue-300 transition-all active:scale-95 shadow-lg shadow-slate-200 disabled:opacity-50"
         >
           Add Habit
         </button>
@@ -83,12 +115,30 @@
 </template>
 
 <script setup lang="ts">
-// Define the events this component can send to the parent
+import { ref } from "vue";
+import { useHabits } from "../UseHabits";
+import type { HabitCategory } from "../types";
+
+// 1. Logic from Composable
+const { addHabit } = useHabits();
+
+// 2. Local State for Form
+const habitName = ref("");
+const selectedCategory = ref<HabitCategory>("Other");
+
 const emit = defineEmits<{
   (e: "close"): void;
 }>();
 
 const closeModal = () => {
   emit("close");
+};
+
+const handleSubmit = () => {
+  if (habitName.value.trim()) {
+    addHabit(habitName.value, selectedCategory.value);
+    habitName.value = "";
+    closeModal(); //
+  }
 };
 </script>

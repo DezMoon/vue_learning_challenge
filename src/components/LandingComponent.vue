@@ -31,6 +31,7 @@
       </div>
 
       <div
+        v-if="habits.length === 0"
         class="bg-white border border-slate-200 rounded-2xl p-8 sm:p-12 shadow-sm flex flex-col items-center text-center"
       >
         <div
@@ -53,7 +54,10 @@
           + Add First Habit
         </button>
       </div>
+
+      <HabitList v-else />
     </div>
+
     <HabitForm v-if="isModalOpen" @close="isModalOpen = false" />
   </div>
 </template>
@@ -61,6 +65,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import HabitForm from "./HabitForm.vue";
+import HabitList from "./HabitList.vue";
+import { useHabits } from "../UseHabits";
+
+// to give me access to the global habits state
+const { habits } = useHabits();
+
 const isModalOpen = ref(false);
 const openModal = () => (isModalOpen.value = true);
 </script>
