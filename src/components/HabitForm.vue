@@ -59,12 +59,12 @@
           :class="[
             'group flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl transition-all hover:scale-105 active:scale-95 border-2',
             selectedCategory === 'Workout'
-              ? 'border-indigo-500 bg-indigo-100'
-              : 'bg-indigo-50/50 border-indigo-400',
+              ? 'border-indigo-400 bg-indigo-100'
+              : 'bg-indigo-50/50 border-indigo-200',
           ]"
         >
           <div
-            class="w-10 h-10 bg-indigo-500 rounded-full mb-3 flex items-center justify-center text-white shadow-md"
+            class="w-10 h-10 bg-indigo-400 rounded-full mb-3 flex items-center justify-center text-white shadow-md"
           >
             <span class="text-lg">🤸</span>
           </div>
@@ -92,9 +92,9 @@
       <input
         v-model="habitName"
         maxlength="50"
-        class="mt-8 border w-full rounded-full border-blue-200 font-serif pl-4 py-3 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
+        class="border-double mt-8 border w-full rounded-full border-blue-200 font-serif pl-4 py-3 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
         type="text"
-        placeholder="Enter your habits here.........."
+        placeholder="Enter your habits here ..."
         @keyup.enter="handleSubmit"
       />
       <div class="text-sm mt-2 text-right text-red-400">

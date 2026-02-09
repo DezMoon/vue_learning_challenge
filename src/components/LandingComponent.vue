@@ -8,7 +8,7 @@
           class="font-serif text-4xl sm:text-6xl text-slate-900 mb-4 tracking-tight"
         >
           Welcome to your
-          <span class="italic text-blue-300">Habit Tracker</span>
+          <span class="italic text-blue-500">Habit Tracker</span>
         </h1>
         <p class="text-slate-500 text-lg sm:text-xl max-w-lg leading-relaxed">
           Stronger routines start with small daily wins. Track your progress,
@@ -24,7 +24,7 @@
         </h2>
         <button
           @click="openModal"
-          class="flex items-center gap-1 text-sm font-medium text-blue-400 hover:text-blue-400"
+          class="flex items-center gap-1 text-sm font-medium text-blue-500 hover:text-blue-400"
         >
           + Quick Add
         </button>

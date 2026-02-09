@@ -4,7 +4,7 @@
       v-if="streakCount > 0"
       class="flex items-center gap-2 mb-4 bg-orange-50 w-fit px-4 py-2 rounded-full border border-orange-100 animate-in fade-in slide-in-from-left duration-700"
     >
-      <span class="text-xl">🔥</span>
+      <span class="text-xl animate-ping">🔥</span>
       <span class="font-bold text-orange-600 tracking-tight"
         >{{ streakCount }} Day Streak</span
       >
@@ -30,7 +30,7 @@
         <button
           @click="toggleStatus(habit.id)"
           :class="[
-            'w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors shrink-0',
+            'w-8 h-8  border-2 flex items-center justify-center transition-colors shrink-0',
             habit.status === 'completed'
               ? 'bg-green-500 border-green-500 text-white'
               : 'border-slate-200 hover:border-blue-400',
@@ -51,13 +51,13 @@
             <div class="flex gap-2">
               <button
                 @click="handleSaveEdit(habit.id)"
-                class="text-green-500 text-xs font-bold uppercase"
+                class="text-green-500 text-xs font-bold uppercase pl-2 pt-6"
               >
                 Save
               </button>
               <button
                 @click="editingId = null"
-                class="text-slate-400 text-xs font-bold uppercase"
+                class="text-slate-400 text-xs font-bold uppercase pl-2 pt-6"
               >
                 Cancel
               </button>
@@ -73,13 +73,43 @@
                   : '',
               ]"
             >
+              {{
+                habit.category === "Health"
+                  ? "🍎"
+                  : habit.category === "Study"
+                    ? "📚"
+                    : habit.category === "Workout"
+                      ? "🤸"
+                      : habit.category === "Other"
+                        ? "➕"
+                        : "✨"
+              }}
+              -
               {{ habit.name }}
             </h4>
             <div class="flex gap-2 mt-1">
+              <!--  <span>
+                {{
+                  habit.category === "Health"
+                    ? "🍎"
+                    : habit.category === "Study"
+                      ? "💼"
+                      : habit.category === "Workout"
+                        ? "🤸"
+                        : habit.category === "Other"
+                          ? "➕"
+                          : "✨"
+                }}
+              </span> -->
               <span
-                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 text-slate-400 uppercase tracking-tighter"
+                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 text-slate-700 uppercase tracking-tighter"
               >
                 {{ habit.category }}
+              </span>
+              <span
+                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 text-slate-700 uppercase tracking-tighter"
+              >
+                {{ habit.status }}
               </span>
             </div>
           </div>
@@ -91,13 +121,14 @@
           <button
             v-if="habit.status !== 'completed'"
             @click="startEdit(habit)"
-            class="p-2 text-slate-300 hover:text-blue-400 transition-colors"
+            class="p-2 text-slate-300 hover:text-blue-400 rounded-full transition-colors w-10"
             title="Edit"
           >
             <span class="text-xl">✏️</span>
           </button>
           <button
             @click="deletingId = habit.id"
+            v-if="habit.status !== 'completed'"
             class="p-2 text-slate-300 hover:bg-red-100 rounded-full transition-colors"
             title="Delete"
           >
@@ -167,10 +198,10 @@ const isAllCompleted = computed(() => {
   );
 });
 
-// IMPORTANT: This watches the computed property above and tells the store to record the win
+// watches to see if all habits are checked
 watch(isAllCompleted, (newValue) => {
   recordDailyWin(newValue);
-}); // immediate check in case tasks were already done on load
+});
 
 const startEdit = (habit: any) => {
   editingId.value = habit.id;
