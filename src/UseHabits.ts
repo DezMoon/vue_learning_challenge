@@ -1,10 +1,11 @@
-import { ref, watch, computed } from "vue";
+// src/useHabits.ts
+import { ref, computed, watch } from "vue";
 import type { Habit, HabitCategory } from "./types";
 
 const STORAGE_KEY = "habit-tracker-data";
 const STREAK_KEY = "habit-streak-dates";
 
-// Initialize data safely
+// --- State ---
 const habits = ref<Habit[]>(
   JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"),
 );
@@ -12,7 +13,7 @@ const completedDates = ref<string[]>(
   JSON.parse(localStorage.getItem(STREAK_KEY) || "[]"),
 );
 
-// Global Watchers
+//so  it can watch what is actually inside the array not just thge barrayu itself, without this it only watches if you add or delete a habit and not editing
 watch(
   habits,
   (newVal) => {
@@ -29,6 +30,7 @@ watch(
   { deep: true },
 );
 
+// creating composable functions to manage habits and streaks so i can use these functions all over the project when needed so i dont have to rewrite themn
 export function useHabits() {
   const addHabit = (name: string, category: HabitCategory) => {
     const newHabit: Habit = {
@@ -42,7 +44,9 @@ export function useHabits() {
 
   const updateHabitName = (id: string, newName: string) => {
     const habit = habits.value.find((h) => h.id === id);
-    if (habit) habit.name = newName;
+    if (habit) {
+      habit.name = newName;
+    }
   };
 
   const toggleStatus = (id: string) => {
@@ -56,38 +60,36 @@ export function useHabits() {
     habits.value = habits.value.filter((h) => h.id !== id);
   };
 
-  // --- STREAK LOGIC FIXED ---
-
   const recordDailyWin = (isAllDone: boolean) => {
-    const today = new Date().toLocaleDateString("en-CA"); // Gets YYYY-MM-DD reliably
-    const dateSet = new Set(completedDates.value);
+    //converting the date to a string(canadian format) so it is easy to sort
+    const today = new Date().toLocaleDateString("en-CA");
+    //to make sure we dont have duplicates and to make it easy to add or remove dates
+    const dates = new Set(completedDates.value);
 
     if (isAllDone) {
-      dateSet.add(today);
+      dates.add(today);
     } else {
-      dateSet.delete(today);
+      dates.delete(today);
     }
-    completedDates.value = Array.from(dateSet);
+    completedDates.value = Array.from(dates);
   };
 
   const streakCount = computed(() => {
     if (completedDates.value.length === 0) return 0;
 
-    const dateSet = new Set(completedDates.value);
+    const dates = new Set(completedDates.value);
     let count = 0;
-    let checkDate = new Date(); // Start with today
+    let checkDate = new Date();
 
-    // Check today. If today isn't done, check yesterday.
+    // If today isn’t done, start from yesterday
     let dateStr = checkDate.toLocaleDateString("en-CA");
-
-    if (!dateSet.has(dateStr)) {
-      // If today isn't done, move back to yesterday to see if streak is still alive
+    if (!dates.has(dateStr)) {
       checkDate.setDate(checkDate.getDate() - 1);
       dateStr = checkDate.toLocaleDateString("en-CA");
     }
 
-    // Loop backwards as long as we find consecutive dates in our set
-    while (dateSet.has(dateStr)) {
+    // Count backwards until streak breaks
+    while (dates.has(dateStr)) {
       count++;
       checkDate.setDate(checkDate.getDate() - 1);
       dateStr = checkDate.toLocaleDateString("en-CA");

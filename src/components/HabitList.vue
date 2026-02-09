@@ -1,6 +1,16 @@
 <template>
   <div class="space-y-4 relative">
     <div
+      v-if="streakCount > 0"
+      class="flex items-center gap-2 mb-4 bg-orange-50 w-fit px-4 py-2 rounded-full border border-orange-100 animate-in fade-in slide-in-from-left duration-700"
+    >
+      <span class="text-xl">🔥</span>
+      <span class="font-bold text-orange-600 tracking-tight"
+        >{{ streakCount }} Day Streak</span
+      >
+    </div>
+
+    <div
       v-if="isAllCompleted"
       class="bg-green-50 border border-green-100 rounded-2xl p-6 mb-6 flex flex-col items-center justify-center gap-2 animate-in slide-in-from-top duration-500"
     >
@@ -88,7 +98,7 @@
           </button>
           <button
             @click="deletingId = habit.id"
-            class="p-2 text-slate-300 hover:bg-red-200 transition-colors"
+            class="p-2 text-slate-300 hover:bg-red-100 rounded-full transition-colors"
             title="Delete"
           >
             <span class="text-xl">🗑️</span>
@@ -109,18 +119,14 @@
         >
           <span class="text-3xl">🚨</span>
         </div>
-
-        <h3 class="text-xl font-bold text-slate-800 mb-2">
-          Are you sure you want to delete this habit?
-        </h3>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Are you sure?</h3>
         <p class="text-slate-500 mb-8 text-sm">
-          Once you delete this habit, it’s gone for good, no take-backs.
+          Once you delete this habit, it’s gone for good.
         </p>
-
         <div class="flex flex-col gap-2">
           <button
             @click="handleDelete(deletingId)"
-            class="w-full py-4 rounded-2xl font-bold bg-red-500 text-white hover:bg-red-600 transition-all shadow-lg shadow-red-200"
+            class="w-full py-4 rounded-2xl font-bold bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-200"
           >
             Yes, Delete it
           </button>
@@ -137,21 +143,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useHabits } from "../UseHabits";
 
-const { habits, toggleStatus, deleteHabit, updateHabitName } = useHabits();
+const {
+  habits,
+  streakCount,
+  toggleStatus,
+  deleteHabit,
+  updateHabitName,
+  recordDailyWin,
+} = useHabits();
 
 const deletingId = ref<string | null>(null);
 const editingId = ref<string | null>(null);
 const editText = ref("");
 
+//congratulations message
 const isAllCompleted = computed(() => {
   return (
     habits.value.length > 0 &&
     habits.value.every((h) => h.status === "completed")
   );
 });
+
+// IMPORTANT: This watches the computed property above and tells the store to record the win
+watch(isAllCompleted, (newValue) => {
+  recordDailyWin(newValue);
+}); // immediate check in case tasks were already done on load
 
 const startEdit = (habit: any) => {
   editingId.value = habit.id;
