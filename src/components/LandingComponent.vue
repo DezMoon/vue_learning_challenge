@@ -71,6 +71,7 @@ import { useHabits } from "../UseHabits";
 // to give me access to the global habits state
 const { habits } = useHabits();
 
+//opensd modal when quick add or add first habit button is clicked
 const isModalOpen = ref(false);
 const openModal = () => (isModalOpen.value = true);
 </script>

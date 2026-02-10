@@ -1,3 +1,5 @@
+<!-- NEW HABIT'S MODAL(FORM USED TO ADD HABITS) -->
+
 <template>
   <div
     class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 sm:p-6"
@@ -119,13 +121,14 @@ import { ref } from "vue";
 import { useHabits } from "../UseHabits";
 import type { HabitCategory } from "../types";
 
-// 1. Logic from Composable
+// Logic from Composable(to add habitg)
 const { addHabit } = useHabits();
 
-// 2. Local State for Form
+// Local State for Form
 const habitName = ref("");
 const selectedCategory = ref<HabitCategory>("Other");
 
+// to close modal when habit is added, we will emit an event to parent component(HabitList.vue) to close the modal
 const emit = defineEmits<{
   (e: "close"): void;
 }>();
@@ -134,6 +137,7 @@ const closeModal = () => {
   emit("close");
 };
 
+// submits new habit to the list and then closes the modal
 const handleSubmit = () => {
   if (habitName.value.trim()) {
     addHabit(habitName.value, selectedCategory.value);

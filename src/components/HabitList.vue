@@ -173,6 +173,7 @@ const {
   resetHabitsIfNewDay, // <-- exposed from composable
 } = useHabits();
 
+// local states for deleting and editing habits
 const deletingId = ref<string | null>(null);
 const editingId = ref<string | null>(null);
 const editText = ref("");
@@ -185,7 +186,7 @@ onMounted(() => {
   }
 });
 
-// congratulations message
+// congratulations message(completion feedback)
 const isAllCompleted = computed(() => {
   return (
     habits.value.length > 0 &&
@@ -197,13 +198,13 @@ const isAllCompleted = computed(() => {
 watch(isAllCompleted, (newValue) => {
   recordDailyWin(newValue);
 });
-
+// starts editing a habit by setting the editingId
 const startEdit = (habit: any) => {
   editingId.value = habit.id;
   editText.value = habit.name;
   deletingId.value = null;
 };
-
+// saves the edited habit name and exits edit mode
 const handleSaveEdit = (id: string) => {
   if (editText.value.trim()) {
     updateHabitName(id, editText.value);
@@ -211,11 +212,12 @@ const handleSaveEdit = (id: string) => {
   }
 };
 
+//handle delete with confirmation modal
 const handleDelete = (id: string) => {
   deleteHabit(id);
   deletingId.value = null;
 };
-
+// v-focus directive to focus input when editing
 const vFocus = {
   mounted: (el: HTMLElement) => el.focus(),
 };
