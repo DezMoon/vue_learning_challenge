@@ -5,9 +5,9 @@
       class="flex items-center gap-2 mb-4 bg-orange-50 w-fit px-4 py-2 rounded-full border border-orange-100 animate-in fade-in slide-in-from-left duration-700"
     >
       <span class="text-xl animate-ping">🔥</span>
-      <span class="font-bold text-orange-600 tracking-tight"
-        >{{ streakCount }} Day Streak</span
-      >
+      <span class="font-bold text-orange-600 tracking-tight">
+        {{ streakCount }} Day Streak
+      </span>
     </div>
 
     <div
@@ -30,7 +30,7 @@
         <button
           @click="toggleStatus(habit.id)"
           :class="[
-            'w-8 h-8  border-2 flex items-center justify-center transition-colors shrink-0',
+            'w-8 h-8 border-2 flex items-center justify-center transition-colors shrink-0',
             habit.status === 'completed'
               ? 'bg-green-500 border-green-500 text-white'
               : 'border-slate-200 hover:border-blue-400',
@@ -84,23 +84,9 @@
                         ? "➕"
                         : "✨"
               }}
-              -
-              {{ habit.name }}
+              - {{ habit.name }}
             </h4>
             <div class="flex gap-2 mt-1">
-              <!--  <span>
-                {{
-                  habit.category === "Health"
-                    ? "🍎"
-                    : habit.category === "Study"
-                      ? "💼"
-                      : habit.category === "Workout"
-                        ? "🤸"
-                        : habit.category === "Other"
-                          ? "➕"
-                          : "✨"
-                }}
-              </span> -->
               <span
                 class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-50 text-slate-700 uppercase tracking-tighter"
               >
@@ -174,7 +160,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { useHabits } from "../UseHabits";
 
 const {
@@ -184,13 +170,22 @@ const {
   deleteHabit,
   updateHabitName,
   recordDailyWin,
+  resetHabitsIfNewDay, // <-- exposed from composable
 } = useHabits();
 
 const deletingId = ref<string | null>(null);
 const editingId = ref<string | null>(null);
 const editText = ref("");
 
-//congratulations message
+// run reset when component mounts
+onMounted(() => {
+  localStorage.setItem("habit-last-reset", "2026-02-09"); //to test
+  if (typeof resetHabitsIfNewDay === "function") {
+    resetHabitsIfNewDay();
+  }
+});
+
+// congratulations message
 const isAllCompleted = computed(() => {
   return (
     habits.value.length > 0 &&

@@ -4,6 +4,7 @@ import type { Habit, HabitCategory } from "./types";
 
 const STORAGE_KEY = "habit-tracker-data";
 const STREAK_KEY = "habit-streak-dates";
+const LAST_RESET_KEY = "habit-last-reset";
 
 // --- State ---
 const habits = ref<Habit[]>(
@@ -13,7 +14,7 @@ const completedDates = ref<string[]>(
   JSON.parse(localStorage.getItem(STREAK_KEY) || "[]"),
 );
 
-//so  it can watch what is actually inside the array not just thge barrayu itself, without this it only watches if you add or delete a habit and not editing
+// so  it can watch what is actually inside the array not just the array itself, without this it only watches if you add or delete a habit and not editing
 watch(
   habits,
   (newVal) => {
@@ -30,8 +31,26 @@ watch(
   { deep: true },
 );
 
-// creating composable functions to manage habits and streaks so i can use these functions all over the project when needed so i dont have to rewrite themn
+//creating composable functions to manage habits and streaks so i can use these functions all over the project when needed so i dont have to rewrite themn
+
+// fdunction to reset a new day(how it works:-
+function resetHabitsIfNewDay() {
+  const today = new Date().toLocaleDateString("en-CA");
+  const lastReset = localStorage.getItem(LAST_RESET_KEY);
+
+  if (lastReset !== today) {
+    habits.value = habits.value.map((h) => ({ ...h, status: "pending" }));
+    localStorage.setItem(LAST_RESET_KEY, today);
+  }
+}
+
+if (typeof resetHabitsIfNewDay === "function") {
+  resetHabitsIfNewDay();
+}
 export function useHabits() {
+  // Run reset check immediately when composable is used
+  resetHabitsIfNewDay();
+
   const addHabit = (name: string, category: HabitCategory) => {
     const newHabit: Habit = {
       id: crypto.randomUUID(),
@@ -61,9 +80,7 @@ export function useHabits() {
   };
 
   const recordDailyWin = (isAllDone: boolean) => {
-    //converting the date to a string(canadian format) so it is easy to sort
     const today = new Date().toLocaleDateString("en-CA");
-    //to make sure we dont have duplicates and to make it easy to add or remove dates
     const dates = new Set(completedDates.value);
 
     if (isAllDone) {
@@ -81,14 +98,12 @@ export function useHabits() {
     let count = 0;
     let checkDate = new Date();
 
-    // If today isn’t done, start from yesterday
     let dateStr = checkDate.toLocaleDateString("en-CA");
     if (!dates.has(dateStr)) {
       checkDate.setDate(checkDate.getDate() - 1);
       dateStr = checkDate.toLocaleDateString("en-CA");
     }
 
-    // Count backwards until streak breaks
     while (dates.has(dateStr)) {
       count++;
       checkDate.setDate(checkDate.getDate() - 1);
@@ -106,5 +121,6 @@ export function useHabits() {
     toggleStatus,
     deleteHabit,
     recordDailyWin,
+    resetHabitsIfNewDay,
   };
 }
